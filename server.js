@@ -1,3 +1,16 @@
+if (process.env.ENABLE_APM === "1") {
+  const apm = require("elastic-apm-node").start({
+    serviceName: "spepas-ussd",
+    serverUrl: process.env.ELASTIC_APM_SERVER_URL,
+    secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
+    environment: process.env.NODE_ENV,
+    active: true,
+    captureBody: "all",
+    errorOnAbortedRequests: true,
+    captureErrorLogStackTraces: "always",
+    logLevel: "debug",
+  });
+}
 const express = require("express");
 const helmet = require("helmet");
 const xss = require("xss-clean");
@@ -10,19 +23,6 @@ const path = require("path");
 //load env vars
 dotenv.config({ path: ".env" });
 require("dotenv").config();
-
-if (process.env.ENABLE_APM === "1") {
-  const apm = require("elastic-apm-node").start({
-    serviceName: "spepas-ussd",
-    serverUrl: process.env.ELASTIC_APM_SERVER_URL,
-    secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
-    environment: process.env.NODE_ENV,
-    active: true,
-    captureBody: "all",
-    errorOnAbortedRequests: true,
-    captureErrorLogStackTraces: "always",
-  });
-}
 
 //initialise express
 const app = express();
