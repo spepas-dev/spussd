@@ -6,6 +6,8 @@ const {
   TransformedData,
 } = require("winston-elasticsearch");
 
+const { combine, label, json, errors } = winston.format;
+
 const esTransformer = (logData) => {
   return ElasticsearchTransformer(logData);
 };
