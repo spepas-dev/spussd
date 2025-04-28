@@ -19,7 +19,7 @@ const errorHandler = require("./middleware/error");
 const { logger, morganMiddleware } = require("./logs/winston");
 const routes = require("./routes/setup");
 const path = require("path");
-// const { checkConnection } = require("./logs/elasticsearch");
+const { checkConnection } = require("./logs/elasticsearch");
 //load env vars
 dotenv.config({ path: ".env" });
 require("dotenv").config();
