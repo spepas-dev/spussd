@@ -1,22 +1,23 @@
-if (process.env.ENABLE_APM === "1") {
-  const apm = require("elastic-apm-node").start({
-    serviceName: "spepas-ussd",
-    serverUrl: process.env.ELASTIC_APM_SERVER_URL,
-    secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
-    environment: process.env.NODE_ENV,
-    active: true,
-    captureBody: "all",
-    errorOnAbortedRequests: true,
-    captureErrorLogStackTraces: "always",
-    logLevel: "debug",
-  });
-}
+// if (process.env.ENABLE_APM === "1") {
+//   const apm = require("elastic-apm-node").start({
+//     serviceName: "spepas-ussd",
+//     serverUrl: process.env.ELASTIC_APM_SERVER_URL,
+//     secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
+//     environment: process.env.NODE_ENV,
+//     active: true,
+//     captureBody: "all",
+//     errorOnAbortedRequests: true,
+//     captureErrorLogStackTraces: "always",
+//     logLevel: "debug",
+//   });
+// }
 const express = require("express");
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const dotenv = require("dotenv");
 const errorHandler = require("./middleware/error");
-const { logger, morganMiddleware } = require("./logs/winston");
+// const { logger, morganMiddleware } = require("./logs/winston");
+const { morganMiddleware } = require("./logs/winston");
 const routes = require("./routes/setup");
 const path = require("path");
 const { checkConnection } = require("./logs/elasticsearch");
@@ -76,7 +77,7 @@ app.use((error, req, res, next) => {
     status: 0,
     message: error.message,
   });
-  logger.error(error.message);
+  // logger.error(error.message);
 });
 //create port
 const PORT = process.env.PORT || 9012;
@@ -91,14 +92,14 @@ app.listen(PORT, () => {
     `Spepas USSD Service : Running in ${process.env.NODE_ENV} mode and listening on port http://:${PORT}`
   );
   // startElasticSearch();
-  logger.info(
-    `Spepas USSD Service: Running in ${process.env.NODE_ENV} mode and listening on port http://:${PORT}`
-  );
+  // logger.info(
+  //   `Spepas USSD Service: Running in ${process.env.NODE_ENV} mode and listening on port http://:${PORT}`
+  // );
 });
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
   console.log(`Error: ${err.message}`);
-  logger.error(err.message);
+  // logger.error(err.message);
   // Close server & exit process
   // server.close(() => process.exit(1));
 });
