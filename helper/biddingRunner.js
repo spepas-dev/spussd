@@ -45,7 +45,7 @@ module.exports = {
           let requests = newUserUpdate.data;
 
           let activities = requests.slice(0, 7).map((item, index) => ({
-            title: `${item.quantity} ${item.sparePart.name} -> ${item.bidings.length} bidding(s)`,
+            title: `${item.sparePart.name}(${item.quantity} ) -> ${item.bidings.length} bid(s)`,
             activity_type: item.request_ID,
             display_number: index + 1,
             default_value: item

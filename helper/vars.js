@@ -23,7 +23,7 @@ let ProcessStatus = {
 }
 
 let staticString = {
-  TITLE : "Welcome to SparePas",
+  TITLE : "Welcome to SpePas",
   BASEURL : "http://localhost:9012/spussd/api/v1/"
 }
 
