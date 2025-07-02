@@ -12,6 +12,7 @@
 //   });
 // }
 const express = require("express");
+const cors = require("cors");
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const dotenv = require("dotenv");
@@ -35,6 +36,23 @@ app.use(express.json());
 //Set Security Headers
 app.use(helmet({ crossOriginResourcePolicy: false }));
 //Set Security Headers
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:4000",
+      "https://api.spepas.com",
+      "https://admin.spepas.com",
+      "https://mocker.spepas.com",
+      "https://spepas.com",
+      "http://localhost:5173",
+    ],
+    // origin: '*',
+    credentials: true,
+    methods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 
 //Prevent XSS Attack
 app.use(xss());
