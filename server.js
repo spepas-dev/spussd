@@ -6,6 +6,13 @@ if (process.env.ENABLE_APM === "1") {
     environment: process.env.NODE_ENV,
     active: true,
     captureBody: "all",
+    capture_headers: true,
+    // optional: custom context
+    context: {
+      request: {
+        headers: true,
+      },
+    },
     errorOnAbortedRequests: true,
     captureErrorLogStackTraces: "always",
     logLevel: "debug",
@@ -71,6 +78,17 @@ app.use(function (req, res, next) {
 app.use(function (req, res, next) {
   / Clickjacking prevention /;
   res.header("Content-Security-Policy", "frame-ancestors directive");
+  next();
+});
+
+app.use((req, res, next) => {
+  const clientIp =
+    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  apm.setCustomContext({
+    client: {
+      ip: clientIp,
+    },
+  });
   next();
 });
 
