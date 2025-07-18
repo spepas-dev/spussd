@@ -80,9 +80,14 @@ exports.RequestSparePartCode = asynHandler(async (req, res, next) => {
    let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
 
 
+   var yearOfMake = spDetailsRes.data.carModel.yearOfMake;
+   var carName = spDetailsRes.data.carModel.name;
+  var detailsTile = `${yearOfMake} ${carName} ${title}`
+  displayText = displayText.replace('{CarDetails}',detailsTile)
+
    inputDic.spare_part = spDetailsRes.data;
    inputDic.spare_part_code = value;
-   inputDic.spare_part_name = title;
+   inputDic.spare_part_name = detailsTile;
    data.session.session_input = inputDic;
    
     resp.requestType = myVars.EXISTING;

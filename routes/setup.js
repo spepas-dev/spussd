@@ -45,6 +45,7 @@ const {
 const {
    CartIndex,
    CartCheckoutIndex,
+   CartAggregationMode,
    CartCheckoutComplete,
    CartRemoveItemIndex,
    CartRemoveItemSelected,
@@ -85,6 +86,8 @@ router.route("/bidding/add-bid-to-cart").post(ADD_BID_TO_CART);
 //Cart
 router.route("/cart/index").post(CartIndex);
 router.route("/cart/checkout-index").post(CartCheckoutIndex);
+router.route("/cart/checkout-aggregation-mode").post(CartAggregationMode);
+
 router.route("/cart/complete-checkout").post(CartCheckoutComplete);
 router.route("/cart/remove-item-index").post(CartRemoveItemIndex);
 router.route("/cart/selected-item-to-remove").post(CartRemoveItemSelected);

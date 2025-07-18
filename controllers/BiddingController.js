@@ -116,7 +116,7 @@ exports.SelectedRequest = asynHandler(async (req, res, next) => {
   inputDic.request_title = title;
   inputDic.request = selectedGroup;
 
-
+var itemName  = `${selectedGroup.default_value.sparePart.carModel.name} ${selectedGroup.default_value.sparePart.name}`
 
   
   
@@ -146,6 +146,7 @@ exports.SelectedRequest = asynHandler(async (req, res, next) => {
 
    let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
 
+   displayText = displayText.replace('{BidName}',itemName)
    inputDic.biddings = activities;
    data.session.session_input = inputDic;
   
@@ -217,6 +218,8 @@ exports.SelectedBid = asynHandler(async (req, res, next) => {
   
   let oneItem = selectedGroup.default_value;
 
+  oneBid = selectedGroup.default_value;
+
 
 
   title = selectedGroup.title;
@@ -234,10 +237,11 @@ exports.SelectedBid = asynHandler(async (req, res, next) => {
 
 
     let userRequest =  inputDic.request.default_value;
-
-
-    let request_title = `${userRequest.quantity} ${userRequest.sparePart.name}`
-    displayText = displayText.replace('{request_title}',request_title).replace('{request_bid}',inputDic.bidding_title)
+    
+  
+    //let request_title = `${userRequest.quantity} ${userRequest.sparePart.name}`
+    let request_title = `${userRequest.sparePart.carModel.yearOfMake} ${userRequest.sparePart.carModel.name} ${userRequest.sparePart.name}`
+    displayText = displayText.replace('{request_title}',request_title).replace('{total_price}',oneBid.price).replace('{unit_price}',oneBid.unitPrice)
 
 
    data.session.session_input = inputDic;

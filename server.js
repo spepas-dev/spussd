@@ -81,16 +81,19 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use((req, res, next) => {
-  const clientIp =
-    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  apm.setCustomContext({
-    client: {
-      ip: clientIp,
-    },
+if (process.env.ENABLE_APM === "1") {
+  app.use((req, res, next) => {
+    const clientIp =
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    apm.setCustomContext({
+      client: {
+        ip: clientIp,
+      },
+    });
+    next();
   });
-  next();
-});
+}
+
 
 // app.use('/Selfie', express.static(path.join(__dirname, '/Selfie')))
 

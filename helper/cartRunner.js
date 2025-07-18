@@ -12,7 +12,30 @@ const UtilityHelper = require("./utilfunc");
 
 module.exports = {
 
+  AggregationMode: async () => {
 
+    let activities = [];
+
+    activities.push({
+      title: `Batch delivery`,
+      activity_type: 1,
+      display_number: 1
+
+    })
+
+    activities.push({
+      title: `Individual delivery`,
+      activity_type: 0,
+      display_number: 2
+
+    })
+
+
+
+
+
+    return activities;
+},
 
     UserCarts: async (session_token) => {
         let message = "success";
@@ -59,7 +82,7 @@ module.exports = {
         */
 
       
-       let generatedText =  items.map((item, index) => `${item.bid.orderRequest.quantity}. ${item.bid.orderRequest.sparePart.name}(s) -> GHS ${item.bid.totalPrice}`).join("\n");
+       let generatedText =  items.map((item, index) => `${item.bid.orderRequest.quantity} ${item.bid.orderRequest.sparePart.name}(s) -> GHS ${item.bid.totalPrice}`).join("\n");
        const totalSum = items.reduce((sum, item) => sum + (item.bid.totalPrice || 0), 0);
        let finalText = `${generatedText}\nTotal Price: ${totalSum}`
 

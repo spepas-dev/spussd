@@ -10,6 +10,7 @@ const { logger } = require("../logs/winston");
 
 exports.AddActivityController = asynHandler(async (req, res, next) => {
 
+    console.log("XXXXXXXXXXXXXXXXX")
     const { reqStatus, message }  = await validateActivity(req.body);
 
     if(!reqStatus)

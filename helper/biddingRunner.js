@@ -45,7 +45,8 @@ module.exports = {
           let requests = newUserUpdate.data;
 
           let activities = requests.slice(0, 7).map((item, index) => ({
-            title: `${item.sparePart.name}(${item.quantity} ) -> ${item.bidings.length} bid(s)`,
+            // -> ${item.bidings.length} bid(s)
+            title: `${item.sparePart.carModel.name} ${item.sparePart.name}`,
             activity_type: item.request_ID,
             display_number: index + 1,
             default_value: item
@@ -65,7 +66,8 @@ module.exports = {
         let message = "success";
 
         let activities = items.slice(0, 7).map((item, index) => ({
-            title: `Price: GHS ${item.totalPrice}  Discount: GHS ${item.discount}`,
+          //title: `Price: GHS ${item.totalPrice}  Discount: GHS ${item.discount}`,
+            title: `GHS ${item.totalPrice}`,
             activity_type: item.bidding_ID,
             display_number: index + 1,
             default_value: item

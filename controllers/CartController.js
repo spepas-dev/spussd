@@ -5,7 +5,7 @@ const UtilityHelper = require("../helper/utilfunc");
 const { myVars,ACTIVITYIDS } = require("../helper/vars");
 const { cleanUpRequest, goToMainMenu, goBackMenu, validatePincode } = require("../helper/autoRunner");
 const { logger } = require("../logs/winston");
-const { UserCarts, CheckoutCart, UserCartsItems , RemoveItemFromCart} = require("../helper/cartRunner");
+const { UserCarts, CheckoutCart, UserCartsItems , RemoveItemFromCart,AggregationMode} = require("../helper/cartRunner");
 
 
 
@@ -34,28 +34,15 @@ exports.CartCheckoutIndex = asynHandler(async (req, res, next) => {
     const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
 
     var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
-    var activities = [];
-    let spDetailsRes = await UserCarts(data.session.token);
 
-    if(!spDetailsRes.status){
-     resp.requestType = myVars.CLEANUP;
-     resp.menuContent = "Invalid input";
-     data.session.date_ended = new Date();
-     activityLog.date_ended = new Date();
-     activityLog.display_text = "Invalid input";
-     activityLog.is_value = 1;
-     activityLog.input_value = value;
-     activityLog.input_display = title;
-     activityLog.extra_data = "";
-      cleanUpRequest(data,activityLog);
-    return UtilityHelper.sendResponse(res, 200, "Success", resp);
-    }
- 
+    let activities = await AggregationMode();
 
-    inputDic.cart_summary = spDetailsRes.data;
+    
+
 
     let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
-    displayText = displayText.replace('{cart-details}',inputDic.cart_summary)
+ 
+    inputDic.aggregationModes = activities;
     data.session.session_input = inputDic;
 
     resp.requestType = myVars.EXISTING;
@@ -69,6 +56,111 @@ exports.CartCheckoutIndex = asynHandler(async (req, res, next) => {
      cleanUpRequest(data,activityLog);
 
    return UtilityHelper.sendResponse(res, 200, "Success", resp);
+
+})
+
+
+
+
+
+
+
+exports.CartAggregationMode = asynHandler(async (req, res, next) => {
+
+  console.log("XXXXXXXXXXXXXXXX::::: Cart mode called")
+  let data = req.body;
+  const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
+
+  let value = data.req.userInput;
+  let title = data.req.userInput;
+  var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
+
+
+  
+  if (value == "0#")
+    {
+      await goToMainMenu(resp,data,activityLog);
+        cleanUpRequest(data,activityLog);
+      return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    } else if (value == "1#")
+    {
+   
+     // let activities2 = await getGroupList(inputDic.group_initials);
+      //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
+     await goBackMenu(resp,activityLog,data);
+      cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    }
+
+
+
+
+
+
+
+  let aggregationMode = inputDic.aggregationModes;
+  
+  let selectedMode = aggregationMode.find(el => el.display_number == Number(value));
+  
+
+  
+  if(!selectedMode)
+  {
+    resp.requestType = myVars.CLEANUP;
+    resp.menuContent = "Invalid input";
+    data.session.date_ended = new Date();
+    activityLog.date_ended = new Date();
+    activityLog.display_text = "Invalid input";
+    activityLog.is_value = 1;
+    activityLog.input_value = value;
+    activityLog.input_display = title;
+    activityLog.extra_data = "";
+     cleanUpRequest(data,activityLog);
+   return UtilityHelper.sendResponse(res, 200, "Success", resp);
+  }
+  
+
+  inputDic.aggregationModeValue = value;
+  inputDic.aggregationModeTitle = title;
+  inputDic.aggregationMode = selectedMode;
+  data.session.session_input = inputDic;
+
+
+
+  var activities = [];
+  let spDetailsRes = await UserCarts(data.session.token);
+
+  if(!spDetailsRes.status){
+   resp.requestType = myVars.CLEANUP;
+   resp.menuContent = "Request failed";
+   data.session.date_ended = new Date();
+   activityLog.date_ended = new Date();
+   activityLog.display_text = "Request failed";
+   activityLog.is_value = 1;
+   activityLog.input_value = value;
+   activityLog.input_display = title;
+   activityLog.extra_data = "";
+    cleanUpRequest(data,activityLog);
+  return UtilityHelper.sendResponse(res, 200, "Success", resp);
+  }
+
+
+  inputDic.cart_summary = spDetailsRes.data;
+  let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
+  displayText = displayText.replace('{cart-details}',inputDic.cart_summary)
+  data.session.session_input = inputDic;
+
+  resp.requestType = myVars.EXISTING;
+  resp.menuContent = displayText;
+  data.session.date_ended = new Date();
+  activityLog.date_ended = new Date();
+  activityLog.display_text = displayText;
+  activityLog.is_value = 0;
+  activityLog.input_value = "";
+  activityLog.extra_data = "";
+   cleanUpRequest(data,activityLog);
+
+ return UtilityHelper.sendResponse(res, 200, "Success", resp);
 
 })
 

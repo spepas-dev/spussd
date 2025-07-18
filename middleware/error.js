@@ -1,4 +1,4 @@
-const { logger } = require("../logs/winston");
+//const { logger } = require("../logs/winston");
 const ErrorResponse = require("../utils/errorResponse");
 const errorHandler = (err, req, res, next) => {
 
@@ -11,25 +11,29 @@ const errorHandler = (err, req, res, next) => {
     if (err.code === '23505') {
         const message = `Duplicate entry found in request`;
         error = new ErrorResponse(message, 404);
-        logger.error(error);
+        //logger.error(error);
+        console.log(error);
     }
     if (err.code === '22P02') {
         const message = `Invalid uuid in request`;
         error = new ErrorResponse(message, 404);
-        logger.error(error);
+        console.log(error);
+        //logger.error(error);
     }
     
     if (err.code === '22007') {
         const message = `Invalid date/timestamp in request`;
         error = new ErrorResponse(message, 404);
-        logger.error(error);
+        console.log(error);
+        //logger.error(error);
     }
 
     //42601  --invalid query
     if (err.type === "entity.parse.failed") {
         const message = `Sorry, Invalid Json Fields`;
         error = new ErrorResponse(message, 404);
-        logger.error(error);
+        console.log(error);
+        //logger.error(error);
     }
 
     
@@ -38,27 +42,31 @@ const errorHandler = (err, req, res, next) => {
     if (err.code === "ER_DBACCESS_DENIED_ERROR") {
         const message = `Db Access Denied`;
         error = new ErrorResponse(message, 404);
-        logger.error(error.code);
+        console.log(error.code);
+        //logger.error(error.code);
     }
 
     if (err.code === "ER_BAD_FIELD_ERROR") {
         const message = `Unknown column in request`;
         error = new ErrorResponse(message, 404);
-        logger.error(error.code);
+        //logger.error(error.code);
     }
 
     if (err.code === "ER_TABLE_EXISTS_ERROR") {
         const message = `Table already exist`;
         error = new ErrorResponse(message, 404);
-        logger.error(error.code);
+        console.log(error.code);
+        //logger.error(error.code);
     }
     if (err.code === "ER_NO_SUCH_TABLE") {
         const message = `Unknown table in request`;
         error = new ErrorResponse(message, 404);
-        logger.error(error.code);
+        console.log(error.code);
+       // logger.error(error.code);
     }
     if (err.code === "EHOSTUNREACH") {
-        logger.error(error.code);
+        console.log(error.code);
+       // logger.error(error.code);
         const message = `Server Failed to connect`;
         return res.status(500).json({
             status: 0,
