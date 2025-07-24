@@ -80,7 +80,12 @@ exports.SelectedRequest = asynHandler(async (req, res, next) => {
    {
   
     // let activities2 = await getGroupList(inputDic.group_initials);
-     //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
+     //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");\
+     /*
+     await goToMainMenu(resp,data,activityLog);
+       cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
+     */
      await goToMainMenu(resp,data,activityLog);
        cleanUpRequest(data,activityLog);
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
