@@ -49,7 +49,8 @@ const {
    CartCheckoutComplete,
    CartRemoveItemIndex,
    CartRemoveItemSelected,
-   COMPLETE_REMOVE_ITEM
+   COMPLETE_REMOVE_ITEM,
+   CartProceedCheckout
 } = require("../controllers/CartController");
 
 
@@ -86,12 +87,17 @@ router.route("/bidding/add-bid-to-cart").post(ADD_BID_TO_CART);
 //Cart
 router.route("/cart/index").post(CartIndex);
 router.route("/cart/checkout-index").post(CartCheckoutIndex);
+router.route("/cart/checkout-proceed").post(CartProceedCheckout);
 router.route("/cart/checkout-aggregation-mode").post(CartAggregationMode);
-
 router.route("/cart/complete-checkout").post(CartCheckoutComplete);
+
+
 router.route("/cart/remove-item-index").post(CartRemoveItemIndex);
 router.route("/cart/selected-item-to-remove").post(CartRemoveItemSelected);
 router.route("/cart/complete-reomove-item").post(COMPLETE_REMOVE_ITEM);
+
+
+
 //
 
 module.exports = router;

@@ -38,6 +38,7 @@ exports.BiddingIndex = asynHandler(async (req, res, next) => {
 
     let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
 
+    inputDic.indexDisplayText = displayText;
    
     data.session.session_input = inputDic;
 
@@ -80,9 +81,9 @@ exports.SelectedRequest = asynHandler(async (req, res, next) => {
   
     // let activities2 = await getGroupList(inputDic.group_initials);
      //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
-    await goBackMenu(resp,activityLog,data);
-     cleanUpRequest(data,activityLog);
-    return UtilityHelper.sendResponse(res, 200, "Success", resp);
+     await goToMainMenu(resp,data,activityLog);
+       cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }
   
   let groupList = inputDic.requests;
@@ -147,6 +148,7 @@ var itemName  = `${selectedGroup.default_value.sparePart.carModel.name} ${select
    let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
 
    displayText = displayText.replace('{BidName}',itemName)
+   inputDic.selectedRequestDisplayText = displayText;
    inputDic.biddings = activities;
    data.session.session_input = inputDic;
   
@@ -190,7 +192,9 @@ exports.SelectedBid = asynHandler(async (req, res, next) => {
   
     // let activities2 = await getGroupList(inputDic.group_initials);
      //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
-    await goBackMenu(resp,activityLog,data);
+
+     var displayText2 = inputDic.indexDisplayText;
+    await goBackMenu(resp,activityLog,data,displayText2);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }
@@ -283,7 +287,8 @@ exports.SelectedBid = asynHandler(async (req, res, next) => {
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
    } else if (value == "1#")
    {
-    await goBackMenu(resp,activityLog,data);
+    var displayText2 = inputDic.selectedRequestDisplayText;
+    await goBackMenu(resp,activityLog,data, displayText2);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }

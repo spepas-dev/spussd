@@ -52,9 +52,14 @@ exports.RequestSparePartCode = asynHandler(async (req, res, next) => {
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
    } else if (value == "1#")
    {
+    /*
     await goBackMenu(resp,data);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    */
+    await goToMainMenu(resp,data,activityLog);
+       cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }
 
    let spDetailsRes = await SparpartDetails(value, data.session.token);
@@ -85,6 +90,7 @@ exports.RequestSparePartCode = asynHandler(async (req, res, next) => {
   var detailsTile = `${yearOfMake} ${carName} ${title}`
   displayText = displayText.replace('{CarDetails}',detailsTile)
 
+  inputDic.backDisplay = displayText;
    inputDic.spare_part = spDetailsRes.data;
    inputDic.spare_part_code = value;
    inputDic.spare_part_name = detailsTile;
@@ -124,7 +130,7 @@ exports.RequestQuantity = asynHandler(async (req, res, next) => {
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
    } else if (value == "1#")
    {
-  
+  console.log("XXXXXXXXX: coming to call go back here")
     await goBackMenu(resp,activityLog,data);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
@@ -158,6 +164,7 @@ exports.RequestQuantity = asynHandler(async (req, res, next) => {
 
    displayText = displayText.replace('{spare_part_code}',inputDic.spare_part_code).replace('{spare_part_name}',inputDic.spare_part_name).replace('{quantity}',inputDic.quantity)
 
+  
    data.session.session_input = inputDic;
   
    resp.requestType = myVars.EXISTING;
@@ -199,7 +206,9 @@ exports.RequestQuantity = asynHandler(async (req, res, next) => {
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
    } else if (value == "1#")
    {
-    await goBackMenu(resp,activityLog,data);
+    var displayTextMain =  inputDic.backDisplay;
+
+    await goBackMenu(resp,activityLog,data,displayTextMain);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }

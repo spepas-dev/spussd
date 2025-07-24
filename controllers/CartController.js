@@ -24,16 +24,94 @@ exports.CartIndex = asynHandler(async (req, res, next) => {
 
 
 
-
-
-
-
 exports.CartCheckoutIndex = asynHandler(async (req, res, next) => {
 
-    let data = req.body;
-    const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
+  let data = req.body;
+  const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
 
-    var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
+  var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
+  var activities = [];
+  let spDetailsRes = await UserCartsItems(data.session.token);
+
+  if(!spDetailsRes.status){
+   resp.requestType = myVars.CLEANUP;
+   resp.menuContent = "Invalid input";
+   data.session.date_ended = new Date();
+   activityLog.date_ended = new Date();
+   activityLog.display_text = "Invalid input";
+   activityLog.is_value = 1;
+   activityLog.input_value = value;
+   activityLog.input_display = title;
+   activityLog.extra_data = "";
+    cleanUpRequest(data,activityLog);
+  return UtilityHelper.sendResponse(res, 200, "Success", resp);
+  }
+
+
+  activities = spDetailsRes.data;
+  inputDic.cartItems = activities;
+
+  let displayText = activities
+  .map(item => item.title)
+  .join('\n');
+
+  displayText = data.activity.description.replace('{CartList}',displayText) 
+  
+  //'\n\n1. Proceed\n1# Back'
+
+  inputDic.BacListPreview = displayText;
+  data.session.session_input = inputDic;
+
+  resp.requestType = myVars.EXISTING;
+  resp.menuContent = displayText;
+  data.session.date_ended = new Date();
+  activityLog.date_ended = new Date();
+  activityLog.display_text = displayText;
+  activityLog.is_value = 0;
+  activityLog.input_value = "";
+  activityLog.extra_data = "";
+
+
+   cleanUpRequest(data,activityLog);
+
+ return UtilityHelper.sendResponse(res, 200, "Success", resp);
+
+})
+
+
+
+
+exports.CartProceedCheckout = asynHandler(async (req, res, next) => {
+
+  let data = req.body;
+  const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
+
+  let value = data.req.userInput;
+  let title = data.req.userInput;
+  var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
+
+
+  
+  if (value == "0#")
+    {
+      await goToMainMenu(resp,data,activityLog);
+        cleanUpRequest(data,activityLog);
+      return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    } else if (value == "1#" || value != "1")
+    {
+   
+     // let activities2 = await getGroupList(inputDic.group_initials);
+      //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
+      /*
+     await goBackMenu(resp,activityLog,data);
+      cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
+     */
+     await goToMainMenu(resp,data,activityLog);
+     cleanUpRequest(data,activityLog);
+   return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    }
+
 
     let activities = await AggregationMode();
 
@@ -41,7 +119,7 @@ exports.CartCheckoutIndex = asynHandler(async (req, res, next) => {
 
 
     let displayText = UtilityHelper.generateDisplayText(activities, data.activity.description);
- 
+    inputDic.aggregationDisplay = displayText;
     inputDic.aggregationModes = activities;
     data.session.session_input = inputDic;
 
@@ -87,9 +165,12 @@ exports.CartAggregationMode = asynHandler(async (req, res, next) => {
    
      // let activities2 = await getGroupList(inputDic.group_initials);
       //let displayText2 = UtilityHelper.generateDisplayText(activities2, "Select Group");
-     await goBackMenu(resp,activityLog,data);
+    
+      var backDisplay = inputDic.BacListPreview;
+     await goBackMenu(resp,activityLog,data, backDisplay);
       cleanUpRequest(data,activityLog);
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    
     }
 
 
@@ -187,7 +268,8 @@ exports.CartCheckoutComplete = asynHandler(async (req, res, next) => {
      return UtilityHelper.sendResponse(res, 200, "Success", resp);
    } else if (value == "1#")
    {
-    await goBackMenu(resp,activityLog,data);
+    var aggDisplay = inputDic.aggregationDisplay;
+    await goBackMenu(resp,activityLog,data,aggDisplay);
      cleanUpRequest(data,activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
    }
