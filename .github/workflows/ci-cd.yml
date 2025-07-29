@@ -1,0 +1,155 @@
+name: CI/CD for Spepas USSD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: jboadi/spepas-ussd
+  NAMESPACE: default
+  SERVICE_NAME: spepas-ussd
+  SERVICE: Spepas USSD
+  KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}  # base64 encoded
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      IMAGE_TAG: stable-${{ github.run_number }}
+
+    steps:
+      - name: Set Start Time
+        id: start
+        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Checkout App Repo
+        uses: actions/checkout@v3
+
+      # - name: Checkout Automation Repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: spepas-dev/spepas-jenkins-automation
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     path: pipeline
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      # Uncomment these when needed
+      # - name: Lint Check
+      #   run: npm run lint:check
+
+      # - name: Prettier Check
+      #   run: npm run prettier:check
+
+      # - name: Unit Tests
+      #   run: npm run test
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $IMAGE_NAME .
+          docker tag $IMAGE_NAME $IMAGE_NAME:${IMAGE_TAG}
+          docker tag $IMAGE_NAME $IMAGE_NAME:stable
+
+      - name: Push Docker Images
+        run: |
+          docker push $IMAGE_NAME:${IMAGE_TAG}
+          docker push $IMAGE_NAME:stable
+
+      - name: Cleanup Docker Images
+        run: |
+          docker rmi $IMAGE_NAME:${IMAGE_TAG} || true
+          docker rmi $IMAGE_NAME:stable || true
+
+      - name: Setup Kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+      #Test cluster
+      - name: Test cluster access
+        run: kubectl get namespaces
+
+      - name: Delete Existing Pods
+        run: |
+          PODS=$(kubectl get pods -n $NAMESPACE -l app=${SERVICE_NAME} -o jsonpath="{.items[*].metadata.name}")
+          for pod in $PODS; do
+            kubectl delete pod -n $NAMESPACE $pod || true
+            sleep 10
+          done
+
+      - name: Set End Time and Duration
+        id: duration
+        run: |
+          END=$(date +%s)
+          START=${{ steps.start.outputs.time }}
+          DIFF=$((END - START))
+          HOURS=$((DIFF / 3600))
+          MINUTES=$(( (DIFF % 3600) / 60 ))
+          SECONDS=$(( DIFF % 60 ))
+          echo "duration=${HOURS}h ${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+
+      - name: Slack Notification (Success)
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "channel": "spepas-jenkins",
+            "username": "GitHub Actions",
+            "icon_url": "https://a.slack-edge.com/205a/img/services/jenkins-ci_72.png",
+            "attachments": [{
+              "color": "good",
+              "title": "BUILD SUCCEEDED: Spepas USSD",
+              "text": "Created by: ${{ github.actor }}",
+              "fields": [
+                {
+                  "title": "Duration Time",
+                  "value": "${{ steps.duration.outputs.duration }}",
+                  "short": true
+                },
+                {
+                  "title": "Stage Name",
+                  "value": "Production",
+                  "short": true
+                }
+              ]
+            }]
+          }' ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Slack Notification (Failure)
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "channel": "spepas-jenkins",
+            "username": "GitHub Actions",
+            "icon_url": "https://a.slack-edge.com/205a/img/services/jenkins-ci_72.png",
+            "attachments": [{
+              "color": "error",
+              "title": "BUILD FAILED: Spepas USSD",
+              "text": "Created by: ${{ github.actor }}",
+              "fields": [
+                {
+                  "title": "Duration Time",
+                  "value": "${{ steps.duration.outputs.duration }}",
+                  "short": true
+                },
+                {
+                  "title": "Stage Name",
+                  "value": "Production",
+                  "short": true
+                }
+              ]
+            }]
+          }' ${{ secrets.SLACK_WEBHOOK }}

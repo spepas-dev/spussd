@@ -1,5 +1,5 @@
 if (process.env.ENABLE_APM === "1") {
-  const apm = require("elastic-apm-node").start({
+  require("elastic-apm-node").start({
     serviceName: "spepas-ussd",
     serverUrl: process.env.ELASTIC_APM_SERVER_URL,
     secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
@@ -80,20 +80,6 @@ app.use(function (req, res, next) {
   res.header("Content-Security-Policy", "frame-ancestors directive");
   next();
 });
-
-if (process.env.ENABLE_APM === "1") {
-  app.use((req, res, next) => {
-    const clientIp =
-      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    apm.setCustomContext({
-      client: {
-        ip: clientIp,
-      },
-    });
-    next();
-  });
-}
-
 
 // app.use('/Selfie', express.static(path.join(__dirname, '/Selfie')))
 
