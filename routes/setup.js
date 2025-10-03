@@ -80,7 +80,8 @@ const {
 // Seller bid definition
 const {
    SELLER_BID_INDEX,
-   SELLER_SELECTED_ITEM
+   SELLER_SELECTED_ITEM,
+   SELLER_SET_FOR_PICKUP
 } = require("../Seller/Controller/SellerBidController");
 
 
@@ -143,6 +144,7 @@ router.route("/seller/request/by-part-index").post(SELLER_REQUEST_PART_INDEX);
 //Seller bid difinition
 router.route("/seller/bid/index").post(SELLER_BID_INDEX);
 router.route("/seller/bid/selected-item").post(SELLER_SELECTED_ITEM);
+router.route("/seller/bid/set-for-pickup").post(SELLER_SET_FOR_PICKUP);
 
 
 module.exports = router;

@@ -294,6 +294,72 @@ let reqBody = {
 
 
         return ({status: true, message: message, data: activities});
-    }
+    },
 
+
+
+    SetItemReadyForDelivery: async (inputDic, data) => {
+
+        console.log(`bidding ID here now::::::: response:: function called`)
+
+
+        let message = "success";
+        let token = process.env.SERVICETOKEN;
+        let key =  process.env.SERVICEKEY;
+        let session_token = data.session.token;
+        console.log("complete final function called")
+
+
+       let items = [];
+       items.push(inputDic.selectedBid.activity_type);
+
+
+let reqBody = {
+    items : items
+      }
+   
+        let headers = {
+            ...(token && { token }), // Add apiKey if provided
+            ...(key && { key }), // Add apiToken if provided
+            ...(session_token && {session_token})
+          };
+
+          var loginUrl = process.env.ORDER_SERVICE_BASE_URL +"invoice/set-item-for-pickup"
+          
+
+
+        let newUserUpdate = await UtilityHelper.makeHttpRequest("POST",loginUrl, reqBody, headers);
+
+
+        console.log(`bidding ID here now::::::: response:: ${inputDic.selectedBid.activity_type}`)
+        console.log(newUserUpdate)
+
+
+
+
+      let reqObj = {
+        msisdn: data.req.msisdn,
+        response: newUserUpdate,
+        session_id: data.session.session_id,
+        user_id: data.session.user_id,
+        request_type: "SET ITEM FOR DELIVERY"
+      }
+
+     
+
+        if(!newUserUpdate)
+            {
+                reqObj.status = 10;
+            }
+
+        if(newUserUpdate.status != 1 )
+          {
+
+            reqObj.status = 10;
+          }
+
+          await userequestModel.add(reqObj)
+
+        return ({status: true, message: message});
+    },
 }

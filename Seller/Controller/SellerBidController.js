@@ -5,7 +5,7 @@ const { REGISTRATION_STATUS, RESPONSE_CODES,myVars } = require("../../helper/var
 const ActivityModel = require("../../DBFunctions/ActivityDb");
 const { validateActivity, cleanUpRequest, goToMainMenu, goBackMenu, validatePincode  } = require("../../helper/autoRunner");
 const { logger } = require("../../logs/winston");
-const {SellerPendingBiddingItems} = require("../helper/sellerBiddingRunner")
+const {SellerPendingBiddingItems,SetItemReadyForDelivery} = require("../helper/sellerBiddingRunner")
 
 
 
@@ -229,6 +229,91 @@ var itemName  = `${bidCode} . ${item.cart.bid.orderRequest.sparePart.carModel.ye
     activityLog.input_display = title;
     activityLog.extra_data = "";
      cleanUpRequest(data,activityLog);
+   return UtilityHelper.sendResponse(res, 200, "Success", resp);
+  
+  })
+
+
+
+
+  exports.SELLER_SET_FOR_PICKUP = asynHandler(async (req, res, next) => {
+
+    let data = req.body;
+    const { activityLog, resp }  = UtilityHelper.initialiaseRequest(data);
+  
+   let value = data.req.userInput;
+   let title = data.req.userInput;
+   var inputDic  = UtilityHelper.formatInputDictionary(data.session.session_input);
+   let selectedGroup = inputDic.selectedBid;
+  
+  
+
+
+
+
+   
+   if (value == "0#")
+   {
+     await goToMainMenu(resp,data,activityLog, 'SELLER');
+       cleanUpRequest(data,activityLog);
+     return UtilityHelper.sendResponse(res, 200, "Success", resp);
+   } else if (value == "0")
+   {
+  
+   var displayText2  =  inputDic.FirstPageDisplayText;
+
+    await goBackMenu(resp,activityLog,data,displayText2);
+     cleanUpRequest(data,activityLog);
+    return UtilityHelper.sendResponse(res, 200, "Success", resp);
+   }
+  
+ 
+   if(value != '1')
+    {
+    resp.requestType = myVars.CLEANUP;
+    resp.menuContent = "Invalid input";
+    data.session.date_ended = new Date();
+    activityLog.date_ended = new Date();
+    activityLog.display_text = "Invalid input";
+    activityLog.is_value = 0;
+    activityLog.input_value = value;
+    activityLog.input_display = title;
+    activityLog.extra_data = "";
+     cleanUpRequest(data,activityLog);
+   return UtilityHelper.sendResponse(res, 200, "Success", resp);
+    }
+  
+ 
+  
+
+    let orderRequest = selectedGroup.default_value;
+    var itemName  = `${String(orderRequest.id)}`;
+  
+  
+  
+
+  let newActivities = [];
+
+   let displayText = UtilityHelper.generateDisplayText(newActivities, data.activity.description);
+
+   displayText = displayText.replace('{ItemCode}',itemName)
+   //inputDic.DateDisplayText = displayText;
+
+
+
+   data.session.session_input = inputDic;
+  
+   resp.requestType = myVars.CLEANUP;
+    resp.menuContent = displayText;
+    data.session.date_ended = new Date();
+    activityLog.date_ended = new Date();
+    activityLog.display_text = displayText;
+    activityLog.is_value = 0;
+    activityLog.input_value = value;
+    activityLog.input_display = title;
+    activityLog.extra_data = "";
+    cleanUpRequest(data,activityLog);
+    SetItemReadyForDelivery(inputDic,data);
    return UtilityHelper.sendResponse(res, 200, "Success", resp);
   
   })
