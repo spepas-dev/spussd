@@ -77,6 +77,15 @@ const {
 
 
 
+// Seller bid definition
+const {
+   SELLER_BID_INDEX,
+   SELLER_SELECTED_ITEM
+} = require("../Seller/Controller/SellerBidController");
+
+
+
+
  
 
 //test routes link
@@ -128,6 +137,12 @@ router.route("/seller/request/bid-delivery-date").post(SELLER_EXPECTED_DELIVERY_
 router.route("/seller/request/by-brand-index").post(SELLER_REQUEST_BRAND_INDEX);
 router.route("/seller/request/select-brand").post(SELLER_SELECTED_BRAND);
 router.route("/seller/request/by-part-index").post(SELLER_REQUEST_PART_INDEX);
+
+
+
+//Seller bid difinition
+router.route("/seller/bid/index").post(SELLER_BID_INDEX);
+router.route("/seller/bid/selected-item").post(SELLER_SELECTED_ITEM);
 
 
 module.exports = router;

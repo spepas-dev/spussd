@@ -241,6 +241,59 @@ let reqBody = {
 
 
         return ({status: true, message: message, originalData: requests, data: activities});
+    },
+
+
+    SellerPendingBiddingItems: async (session_token,seller_id) => {
+        let message = "success";
+        let token = process.env.SERVICETOKEN;
+        let key =  process.env.SERVICEKEY;
+
+          
+          
+        let headers = {
+            ...(token && { token }), // Add apiKey if provided
+            ...(key && { key }), // Add apiToken if provided
+            ...(session_token && {session_token})
+          };
+
+          var loginUrl = process.env.ORDER_SERVICE_BASE_URL +"invoice/pending-seller-invoice/"+seller_id
+          
+
+
+        let newUserUpdate = await UtilityHelper.makeHttpRequest("GET",loginUrl, null, headers);
+         
+        if(!newUserUpdate)
+            {
+                return ({status: false, message: "Unable to connect to authentication services"});
+            }
+
+        if(newUserUpdate.status != 1 )
+          {
+
+            return ({status: false, message: newUserUpdate.message});
+          }
+
+
+
+          let requests = UtilityHelper.getAllItemsFromInvoice(newUserUpdate.data);
+
+          let activities = requests.map((item, index) => ({
+           
+            title: `B${String(item.cart.bid.id).padStart(8, '0')}: ${item.cart.bid.orderRequest.sparePart.carModel.name} ${item.cart.bid.orderRequest.sparePart.name}(${item.cart.bid.orderRequest.quantity})`,
+            activity_type: item.item_id,
+            display_number: index + 1,
+            default_value: item
+
+        }));
+
+
+
+
+
+
+
+        return ({status: true, message: message, data: activities});
     }
 
 }

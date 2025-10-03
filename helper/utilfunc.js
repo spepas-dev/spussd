@@ -90,7 +90,9 @@ function groupByPart(biddings) {
 
 
 
-
+ussd.getAllItemsFromInvoice = (invoices) =>{
+  return invoices.flatMap(invoice => invoice.items || []);
+}
 
 
 
