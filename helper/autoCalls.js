@@ -10,7 +10,7 @@ module.exports = {
         method,
         url,
         credentials: 'include',
-        data: JSON.stringify(json), //{s:'security',a:'basicdata'}
+        data: json, //{s:'security',a:'basicdata'}
         headers: {
           'Content-Type': 'application/json', //TODO: Accept application/json
           'Authorization': `Bearer ${auth}`

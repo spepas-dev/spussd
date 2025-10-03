@@ -83,12 +83,12 @@ module.exports = {
    
 
     validateActivity: async (data) => {
-        let {isMain,nonCustomer,displayNumber,baseID} = data;
+        let {isMain,nonCustomer,displayNumber,baseID, user_type} = data;
        
         if(isMain == 1)
         {
             //adding main activity, validate 
-            let activityRes = await ActivityModel.mainDisplayNumberDetails(displayNumber,nonCustomer);
+            let activityRes = await ActivityModel.mainDisplayNumberDetails(displayNumber,nonCustomer,user_type);
             console.log("XXXXXXXXXXXX:::::")
             console.log(activityRes)
             if(activityRes)
@@ -141,9 +141,9 @@ module.exports = {
      //  console.log("?????????????????: after update " + updateRes)
 
     },
-    goToMainMenu: async (resp, data,activityLog) => {
+    goToMainMenu: async (resp, data,activityLog,user_type = "BUYER") => {
 
-        let mainActs = await ActivityModel.main(0);
+        let mainActs = await ActivityModel.main(0, user_type);
         let displayText = UtilityHelper.generateDisplayText(mainActs, staticString.TITLE);
         resp.requestType = myVars.EXISTING;
         resp.menuContent = displayText;

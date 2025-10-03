@@ -23,7 +23,7 @@ exports.AddActivityController = asynHandler(async (req, res, next) => {
         return UtilityHelper.sendResponse(res, 200, message, respBody)
     }
 
-    let { screenNumber, hope, activityType,title,description,nextDisplayText,displayNumber,isMain,baseID,endpoint,createdBy,createdByName,defaultValue,nonCustomer } = req.body
+    let { screenNumber, hope, activityType,title,description,nextDisplayText,displayNumber,isMain,baseID,endpoint,createdBy,createdByName,defaultValue,nonCustomer,user_type } = req.body
 
     let newActivity = {
         activity_type: activityType,
@@ -38,7 +38,8 @@ exports.AddActivityController = asynHandler(async (req, res, next) => {
         created_by: createdBy,
         created_by_name: createdByName,
         default_value:defaultValue,
-        non_customer:nonCustomer
+        non_customer:nonCustomer,
+        user_type: user_type
     }
 
     let activityRes = await ActivityModel.add(newActivity)

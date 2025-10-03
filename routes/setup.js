@@ -15,7 +15,8 @@ const {
  
 
  const {
-   BaseRouter
+   BaseRouter,
+   SellerBaseRouter
 } = require("../controllers/BaseControler");
 
 
@@ -42,6 +43,8 @@ const {
 
 
 
+
+
 const {
    CartIndex,
    CartCheckoutIndex,
@@ -57,6 +60,20 @@ const {
 
 
 
+//seller requests definitions
+
+const {
+   SELLER_REQUEST_INDEX,
+   SELLER_REQUEST_ALL_INDEX,
+   SELLER_SELECTED_BID,
+   SELLER_UNIT_PRICE,
+   SELLER_EXPECTED_DELIVERY_DATE,
+   SELLER_REQUEST_BRAND_INDEX,
+   SELLER_SELECTED_BRAND,
+   SELLER_REQUEST_PART_INDEX
+} = require("../Seller/Controller/RequestController");
+
+
 
 
 
@@ -66,6 +83,7 @@ const {
 router.route("/testapi").get(TestController);
 router.route("/activity/add").post(AddActivityController);
 router.route("/base/router").post(BaseRouter);
+router.route("/base/seller").post(SellerBaseRouter);
 
 
 
@@ -98,6 +116,18 @@ router.route("/cart/complete-reomove-item").post(COMPLETE_REMOVE_ITEM);
 
 
 
-//
+
+
+
+//seller route definitions
+router.route("/seller/request/index").post(SELLER_REQUEST_INDEX);
+router.route("/seller/request/all-index").post(SELLER_REQUEST_ALL_INDEX);
+router.route("/seller/request/all-selected-bid").post(SELLER_SELECTED_BID);
+router.route("/seller/request/bid-unit-price").post(SELLER_UNIT_PRICE);
+router.route("/seller/request/bid-delivery-date").post(SELLER_EXPECTED_DELIVERY_DATE);
+router.route("/seller/request/by-brand-index").post(SELLER_REQUEST_BRAND_INDEX);
+router.route("/seller/request/select-brand").post(SELLER_SELECTED_BRAND);
+router.route("/seller/request/by-part-index").post(SELLER_REQUEST_PART_INDEX);
+
 
 module.exports = router;
