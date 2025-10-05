@@ -50,11 +50,11 @@ const {
 // } = require("../Seller/Controller/RequestController");
 
 // Seller bid definition
-const {
-  SELLER_BID_INDEX,
-  SELLER_SELECTED_ITEM,
-  SELLER_SET_FOR_PICKUP,
-} = require("../Seller/Controller/SellerBidController");
+// const {
+//   SELLER_BID_INDEX,
+//   SELLER_SELECTED_ITEM,
+//   SELLER_SET_FOR_PICKUP,
+// } = require("../Seller/Controller/SellerBidController");
 const {
   SELLER_REQUEST_INDEX,
   SELLER_REQUEST_ALL_INDEX,
@@ -65,6 +65,11 @@ const {
   SELLER_SELECTED_BRAND,
   SELLER_REQUEST_PART_INDEX,
 } = require("../Seller/Controller/RequestController");
+const {
+  SELLER_SET_FOR_PICKUP,
+  SELLER_SELECTED_ITEM,
+  SELLER_BID_INDEX,
+} = require("../Seller/Controller/SellerBidController");
 
 //test routes link
 router.route("/testapi").get(TestController);
