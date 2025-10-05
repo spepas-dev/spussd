@@ -267,7 +267,6 @@ exports.SELLER_UNIT_PRICE = asynHandler(async (req, res, next) => {
     cleanUpRequest(data, activityLog);
     return UtilityHelper.sendResponse(res, 200, "Success", resp);
   } else if (value == "0") {
-    //  hope this works
     // var displayText2 = inputDic.selectedRequestDisplayText;
     inputDic.seller_active_biddings_page_number = 1;
     var displayText2 = inputDic.FirstPageDisplayText;
