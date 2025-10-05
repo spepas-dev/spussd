@@ -20,7 +20,7 @@ const {
   SubmitBid,
   SellerActiveBiddingGroupedByBrand,
   SellerActiveBiddingGroupedByPart,
-} = require("../helper/sellerBiddingRunner");
+} = require("../../seller/helper/sellerBiddingRunner");
 
 exports.SELLER_REQUEST_INDEX = asynHandler(async (req, res, next) => {
   let data = req.body;

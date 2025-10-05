@@ -55,21 +55,36 @@ const {
 //   SELLER_SELECTED_ITEM,
 //   SELLER_SET_FOR_PICKUP,
 // } = require("../Seller/Controller/SellerBidController");
+// const {
+//   SELLER_REQUEST_INDEX,
+//   SELLER_REQUEST_ALL_INDEX,
+//   SELLER_SELECTED_BID,
+//   SELLER_UNIT_PRICE,
+//   SELLER_EXPECTED_DELIVERY_DATE,
+//   SELLER_REQUEST_BRAND_INDEX,
+//   SELLER_SELECTED_BRAND,
+//   SELLER_REQUEST_PART_INDEX,
+// } = require("./seller/controller/RequestController");
+const {
+  SELLER_BID_INDEX,
+  SELLER_SELECTED_ITEM,
+  SELLER_SET_FOR_PICKUP,
+} = require("../controllers/seller/SellerBidController");
 const {
   SELLER_REQUEST_INDEX,
   SELLER_REQUEST_ALL_INDEX,
   SELLER_SELECTED_BID,
-  SELLER_UNIT_PRICE,
   SELLER_EXPECTED_DELIVERY_DATE,
   SELLER_REQUEST_BRAND_INDEX,
   SELLER_SELECTED_BRAND,
   SELLER_REQUEST_PART_INDEX,
-} = require("./seller/controller/RequestController");
-const {
-  SELLER_SET_FOR_PICKUP,
-  SELLER_SELECTED_ITEM,
-  SELLER_BID_INDEX,
-} = require("./seller/controller/SellerBidController");
+  SELLER_UNIT_PRICE,
+} = require("../controllers/seller/RequestController");
+// const {
+//   SELLER_SET_FOR_PICKUP,
+//   SELLER_SELECTED_ITEM,
+//   SELLER_BID_INDEX,
+// } = require("./seller/controller/SellerBidController");
 
 //test routes link
 router.route("/testapi").get(TestController);
