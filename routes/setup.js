@@ -64,12 +64,12 @@ const {
   SELLER_REQUEST_BRAND_INDEX,
   SELLER_SELECTED_BRAND,
   SELLER_REQUEST_PART_INDEX,
-} = require("../Seller/Controller/RequestController");
+} = require("./seller/controller/RequestController");
 const {
   SELLER_SET_FOR_PICKUP,
   SELLER_SELECTED_ITEM,
   SELLER_BID_INDEX,
-} = require("../Seller/Controller/SellerBidController");
+} = require("./seller/controller/SellerBidController");
 
 //test routes link
 router.route("/testapi").get(TestController);
