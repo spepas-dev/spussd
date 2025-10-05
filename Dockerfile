@@ -11,6 +11,7 @@ COPY middleware ./middleware
 COPY prisma ./prisma
 COPY routes ./routes
 COPY config ./config
+COPY Seller ./Seller
 COPY utils ./utils
 COPY server.js ./
 RUN npm install -g pm2

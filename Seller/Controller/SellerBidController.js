@@ -18,7 +18,7 @@ const { logger } = require("../../logs/winston");
 const {
   SellerPendingBiddingItems,
   SetItemReadyForDelivery,
-} = require("../../seller/helper/sellerBiddingRunner");
+} = require("../helper/sellerBiddingRunner");
 
 exports.SELLER_BID_INDEX = asynHandler(async (req, res, next) => {
   let data = req.body;
