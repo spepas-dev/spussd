@@ -12,6 +12,116 @@ const ActivityModel = require("../DBFunctions/ActivityDb");
 let ussd = {};
 
 
+function groupByBrand(biddings) {
+  const grouped = {};
+  
+  biddings.forEach(bidding => {
+      const brandName = bidding.orderRequest?.sparePart?.carModel?.carBrand?.name;
+      
+      if (brandName) {
+          if (!grouped[brandName]) {
+              grouped[brandName] = [];
+          }
+          grouped[brandName].push(bidding);
+      }
+  });
+  
+  return grouped;
+}
+
+
+ussd.groupByBrandAsArray = (biddings) =>{
+  const grouped = groupByBrand(biddings);
+  
+  return Object.keys(grouped).map(brandName => ({
+      brandName: brandName,
+      count: grouped[brandName].length,
+      items: grouped[brandName]
+  }));
+}
+
+
+
+ussd.filterByCarBrand = (biddings, carBrandName)=>{
+  return biddings.filter(bidding => {
+      const modelName = bidding.orderRequest?.sparePart?.carModel?.carBrand?.name;
+      return modelName && modelName.toLowerCase() === carBrandName.toLowerCase();
+  });
+}
+
+
+
+ussd.filterByPartName = (biddings, carPartName)=>{
+  return biddings.filter(bidding => {
+      const modelName = bidding.orderRequest?.sparePart?.name;
+      return modelName && modelName.toLowerCase() === carPartName.toLowerCase();
+  });
+}
+
+
+
+ussd.groupByPartAsArray = (biddings) =>{
+  const grouped = groupByPart(biddings);
+  
+  return Object.keys(grouped).map(brandName => ({
+      brandName: brandName,
+      count: grouped[brandName].length,
+      items: grouped[brandName]
+  }));
+}
+
+
+function groupByPart(biddings) {
+  const grouped = {};
+  
+  biddings.forEach(bidding => {
+      const brandName = bidding.orderRequest?.sparePart?.name;
+      
+      if (brandName) {
+          if (!grouped[brandName]) {
+              grouped[brandName] = [];
+          }
+          grouped[brandName].push(bidding);
+      }
+  });
+  
+  return grouped;
+}
+
+
+
+ussd.getAllItemsFromInvoice = (invoices) =>{
+  return invoices.flatMap(invoice => invoice.items || []);
+}
+
+
+
+
+ussd.isValidDate = (dateString) =>{
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+  
+  const date = new Date(dateString);
+  return !isNaN(date) && date.toISOString().slice(0, 10) === dateString;
+}
+
+ussd.getPaginatedList = (list, page, pageSize = 4) => {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  return list.slice(from, to + 1);
+};
+
+ussd.getTotalPages = (list, pageSize = 4) => {
+  return Math.ceil(list.length / pageSize);
+};
+
+
+
+
+ussd.isDecimal = (value) => {
+  const num = Number(value);
+  return !isNaN(num) && isFinite(num) && num > 0;
+};
 
     ussd.sha256Encrypt = (textPhrase) => {
 
@@ -365,8 +475,8 @@ ussd.sendResponse = (res, code,message, data) => {
 ussd.makeHttpRequest = async (method, url, data = null, headers = {}) => {
     try {
       const agent = new https.Agent({ rejectUnauthorized: false });
-      console.log("XXXXXXXXXXXXXX url:")
-      console.log(data);
+     // console.log("XXXXXXXXXXXXXX url:")
+     // console.log(data);
       const options = {
         method: method.toUpperCase(),
         url,
@@ -378,7 +488,7 @@ ussd.makeHttpRequest = async (method, url, data = null, headers = {}) => {
       };
   
       const response = await axios(options);
-      console.log(response)
+     // console.log(response)
       return response.data;
     } catch (error) {
       console.error(`Error in ${method} request to ${url}:`, error.message);

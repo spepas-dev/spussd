@@ -9,21 +9,26 @@ const { registerUser, postInternalRequest, LoginUser } = require("../helper/auto
 const { logger } = require("../logs/winston");
 
 
-exports.BaseRouter = asynHandler(async (req, res, next) => {
+
+const ProcessRequest = async (req, user_type) => {
     let { requestType, msisdn, sessionId, currentMenu, operator, userInput, shortCode } = req.body
 
 
-    // res.send("hello Gyanima" )
- 
+    console.log(`XXXXXXXXXXXX All request check ${user_type}`)
     if (requestType == myVars.INITIATION) {
 
+        if(!user_type)
+            {
+                user_type = "BUYER"; 
+            }
         let objData = {
             external_session_id: sessionId,
             msisdn: msisdn,
             status: 1,
             hope: 0,
             request_details: req.body,
-            input: userInput
+            input: userInput,
+            user_type:user_type
         }
 
         let results = await sessionModel.add(objData);
@@ -55,7 +60,12 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 sessionId: sessionId,
                 currentMenu: currentMenu
             }
-            return UtilityHelper.sendResponse(res, 200, "Unable to save session", erroObj)
+
+            return {
+                status: 200,
+                message: "Unable to save session",
+                data: erroObj
+            }
            }
 
            console.log("------- userID here::::: ");
@@ -74,7 +84,13 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 sessionId: sessionId,
                 currentMenu: currentMenu
             }
-            return UtilityHelper.sendResponse(res, 200, "Unable to save session", erroObj)
+
+            return {
+                status: 200,
+                message: "Unable to save session",
+                data: erroObj
+            }
+
            }
 
 
@@ -86,6 +102,7 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
            let externalUser = await LoginUser(msisdn)
 
+          
            if(!externalUser.status){
             let erroObj = {
                 msisdn : msisdn,
@@ -94,12 +111,25 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 sessionId: sessionId,
                 currentMenu: currentMenu
             }
-            return UtilityHelper.sendResponse(res, 200, "Unregistered user", erroObj)
+
+            return {
+                status: 200,
+                message: "Unregistered user",
+                data: erroObj
+            }
            }
          
 
+           //validate based on user type
 
-           console.log("XXXXX externalUser:::: ")
+           
+           if(user_type == "SELLER"){
+            if(!externalUser.data.data.user.sellerDetails){
+                //automatic convert request to Buyer if non seller tries to access seller profile
+                user_type = "BUYER";
+                userSession.user_type = user_type;
+            }
+           }
            
            console.log(externalUser)
 
@@ -121,7 +151,7 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
            // var mainActs = _activityRepository.main(nonCust);
 
-           let mainActs = await ActivityModel.main(nonCust);
+           let mainActs = await ActivityModel.main(nonCust, user_type);
 
            if (!mainActs)
            {
@@ -132,9 +162,15 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 sessionId: sessionId,
                 currentMenu: currentMenu
             }
-            return UtilityHelper.sendResponse(res, 200, "Unable to save session", erroObj)
-           }
 
+            return {
+                status: 200,
+                message: "Unable to save session",
+                data: erroObj
+            }
+
+           }
+         
 
 
 
@@ -148,7 +184,15 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
             sessionId: sessionId,
             currentMenu: currentMenu
         }
-        return UtilityHelper.sendResponse(res, 200, "Success", sucObj)
+
+
+        return {
+            status: 200,
+            message: "Success",
+            data: sucObj
+        }
+
+
         } else {
             let erroObj = {
                 msisdn : msisdn,
@@ -157,7 +201,14 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 sessionId: sessionId,
                 currentMenu: currentMenu
             }
-            return UtilityHelper.sendResponse(res, 200, "Unable to save session", erroObj)
+
+            return {
+                status: 200,
+                message: "Unable to save session",
+                data: erroObj
+            }
+
+
 
         }
 
@@ -180,9 +231,19 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
             let errorMessage = `Unable to retrieve session at Base route:  ${sessionId} `;
             logger.error(errorMessage);
-            return UtilityHelper.sendResponse(res, 200, "Unable to save session", erroObj)
+
+
+
+
+            return {
+                status: 200,
+                message: "Unable to save session",
+                data: erroObj
+            }
+
         }
 
+        //user_type = results
         console.log("after external search:.....")
 
         //  User sessionUser = _userRespository.byID((Guid)session.userID);
@@ -207,7 +268,15 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
             let errorMessage = `Unable to retrieve session user at Base route:  ${userSession.user_id} `;
             logger.error(errorMessage);
-            return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj)
+
+
+            return {
+                status: 200,
+                message: errorMessage,
+                data: erroObj
+            }
+
+
         }
 
         let user = userResults;
@@ -226,8 +295,8 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                     if (userSession.hope == 0)
                     {
                         //search from base
-                        console.log("?????????????????? coming to make the call:  ")
-                        let ActDetResult = await ActivityModel.mainDisplayNumberDetails(userInput,nonCust);
+                        console.log("XXXXXXXXXXXX All request check")
+                        let ActDetResult = await ActivityModel.mainDisplayNumberDetails(userInput,nonCust, user_type);
 
                         if(!ActDetResult)
                         {
@@ -241,7 +310,13 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                 
                             let errorMessage = `Unable to retrieve activity details at Base route:  ${userInput} `;
                             logger.error(errorMessage);
-                            return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj)
+
+
+                            return {
+                                status: 200,
+                                message: errorMessage,
+                                data: erroObj
+                            }
                         }
 
                         activity = ActDetResult;
@@ -277,7 +352,14 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                     
                                 let errorMessage = `Invalid input at base route route:  ${userInput} `;
                                 logger.error(errorMessage);
-                                return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj) 
+
+
+                                return {
+                                    status: 200,
+                                    message: errorMessage,
+                                    data: erroObj
+                                }
+
                             }
 
                             activity = activityResult;
@@ -302,7 +384,14 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                      
                                  let errorMessage = `Invalid session last activity ID base id at route:  ${userSession.last_activity_id} `;
                                  logger.error(errorMessage);
-                                 return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj) 
+
+
+                                 return {
+                                    status: 200,
+                                    message: errorMessage,
+                                    data: erroObj
+                                }
+
                              }
 
                              console.log(activityResult)
@@ -328,7 +417,14 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                     
                                 let errorMessage = `Invalidskip_to_id  at base route:  ${userSession.skip_to_id} `;
                                 logger.error(errorMessage);
-                                return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj) 
+
+
+                                return {
+                                    status: 200,
+                                    message: errorMessage,
+                                    data: erroObj
+                                }
+
                             }
 
 
@@ -359,7 +455,12 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
                   
 
                     let resp = await postInternalRequest(intReqObj)
-                    return UtilityHelper.sendResponse(res, 200, "Success", resp)
+
+                    return {
+                        status: 200,
+                        message: "Success",
+                        data: resp
+                    }
     }else if (requestType == myVars.CLEANUP) {
         let erroObj = {
             msisdn : msisdn,
@@ -371,7 +472,14 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
         let errorMessage = `Request done `;
         logger.error(errorMessage);
-        return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj) 
+
+
+        return {
+            status: 200,
+            message: errorMessage,
+            data: erroObj
+        }
+
 
     }else{
         let erroObj = {
@@ -384,7 +492,36 @@ exports.BaseRouter = asynHandler(async (req, res, next) => {
 
         let errorMessage = `Invalid request `;
         logger.error(errorMessage);
-        return UtilityHelper.sendResponse(res, 200, errorMessage, erroObj) 
+
+
+        return {
+            status: 200,
+            message: errorMessage,
+            data: erroObj
+        }
+
+
     }
+
+
+};
+
+
+
+exports.BaseRouter = asynHandler(async (req, res, next) => {
+
+
+    const result = await ProcessRequest(req,"BUYER");
+    return UtilityHelper.sendResponse(res, result.status, result.message, result.data)
+
+})
+
+
+
+exports.SellerBaseRouter = asynHandler(async (req, res, next) => {
+
+
+    const result = await ProcessRequest(req,"SELLER");
+    return UtilityHelper.sendResponse(res, result.status, result.message, result.data)
 
 })

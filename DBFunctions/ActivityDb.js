@@ -56,15 +56,16 @@ ussd.byBaseIDanddisplayNumber = async (baseID,displayNumber) => {
 
 
 
-  ussd.mainDisplayNumberDetails = async (displayNumber,nonCustomer) => {
+  ussd.mainDisplayNumberDetails = async (displayNumber,nonCustomer, user_type = "BUYER") => {
     try {
-        console.log("XXXXXXXXXXXXXXXXX:   ")
+       
         console.log(displayNumber)
         const user = await prisma.activity.findFirst({
             where: {
                 display_number: Number(displayNumber),
                 non_customer: nonCustomer,
-                is_main: 1
+                is_main: 1,
+                user_type: user_type
             },
           });
   
@@ -140,14 +141,15 @@ ussd.byBaseD = async (baseID) => {
 
 
 
-  ussd.main = async (custStatus) => {
+  ussd.main = async (custStatus, user_type = "BUYER") => {
     try {
         const schools = await prisma.activity.findMany({
            
             where: {
                 is_main: 1,
                 status: 1,
-                non_customer: custStatus
+                non_customer: custStatus,
+                user_type: user_type
             },
             orderBy: {
                 display_number: 'asc', // Ensure your field is correct (createdAt or date_added)

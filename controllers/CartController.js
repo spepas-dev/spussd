@@ -16,8 +16,6 @@ exports.CartIndex = asynHandler(async (req, res, next) => {
   
     const { activityLog, resp }  = await UtilityHelper.GenerateStaticMenu(data);
      cleanUpRequest(data,activityLog);
-     console.log("????????? response: ")
-     console.log(resp)
    return UtilityHelper.sendResponse(res, 200, "Success", resp);
 
 })

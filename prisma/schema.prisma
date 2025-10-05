@@ -32,6 +32,7 @@ model  activity{
   created_by_name String
   default_value String 
   non_customer Int
+  user_type String  @default("")
 }
 
 model activity_log{
@@ -75,7 +76,8 @@ model session{
    session_input Json?
    token String?
    external_user Json? 
-   refresh_token String? 
+   refresh_token String?
+   user_type  String @default("BUYER") 
 
 }
 
